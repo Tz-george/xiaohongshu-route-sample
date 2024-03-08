@@ -3,21 +3,26 @@ import {computed} from "vue";
 import {useRoute} from "vue-router";
 
 const route = useRoute()
+const routeName = computed(() => route.name)
 const id = computed(() => route.params.id)
-console.log('Detail')
+const dataItem = computed(() => {
+  const imageData = JSON.parse(localStorage.getItem('imageData'))
+  return imageData.find(item => item.url.split('/').pop() === id.value)
+})
 </script>
 
 <template>
   <div>
-    <router-link :to="{
+    <div class="flex items-center mb-3">
+      <router-link v-if="routeName === 'DetailId'" :to="{
       name: 'Home'
     }">
-      <button >back</button>
-    </router-link>
-    <div>{{ id }}</div>
+        <button>Home</button>
+      </router-link>
+      <span class="ml-auto mr-auto">{{ id }}</span>
+    </div>
+    <div>
+      <img :src="dataItem.download_url" alt="">
+    </div>
   </div>
 </template>
-
-<style scoped>
-
-</style>
