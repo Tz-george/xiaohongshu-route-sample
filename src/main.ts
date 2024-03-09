@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import { router } from "./pages";
+import { router } from "./pages/router.ts";
 import ElementPlus from 'element-plus'
 import "element-plus/dist/index.css"
 import './style.css'

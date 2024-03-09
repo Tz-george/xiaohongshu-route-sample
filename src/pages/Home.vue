@@ -1,3 +1,17 @@
+<template>
+  <div>
+    <div class="text-red-700">Home</div>
+    <div class="w-full flex flex-wrap gap-3">
+      <router-link v-for="item in dataList" :to="`/home/${item.id}`">
+        <img :src="item.url" alt="">
+      </router-link>
+    </div>
+    <el-dialog title="Detail" v-model="dialogVisible">
+      <router-view></router-view>
+    </el-dialog>
+  </div>
+</template>
+
 <script setup lang="ts">
 import {computed, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
@@ -22,31 +36,25 @@ const dataList = ref([])
 const loading = ref(false)
 function getList() {
   loading.value = true
-  axios.get('https://picsum.photos/v2/list')
-      .then(({ data }) => {
-        dataList.value = data.map(item => ({
-          id: item.url.split('/').pop(),
-          url: randomSize(item.download_url)
-        }))
-        localStorage.setItem('imageData', JSON.stringify(data))
-  })
-      .finally(() => {
-        loading.value = false
-      })
+  const data = localStorage.getItem('imageData')
+  if (!data) {
+    axios.get('https://picsum.photos/v2/list')
+        .then(({data}) => setDataList(data))
+        .then(data => localStorage.setItem('imageData', JSON.stringify(data)))
+        .finally(() => {
+          loading.value = false
+        })
+  } else {
+    setDataList(JSON.parse(data))
+  }
 }
 getList()
-</script>
 
-<template>
-  <div>
-    <div class="text-red-700">Home</div>
-    <div class="w-full flex flex-wrap gap-3">
-      <router-link v-for="item in dataList" :to="`/home/${item.id}`">
-        <img :src="item.url" alt="">
-      </router-link>
-    </div>
-  <el-dialog title="Detail" v-model="dialogVisible">
-    <router-view></router-view>
-  </el-dialog>
-  </div>
-</template>
+function setDataList(data) {
+  dataList.value = data.map(item => ({
+    id: item.url.split('/').pop(),
+    url: randomSize(item.download_url)
+  }))
+  return data
+}
+</script>
